@@ -37,15 +37,19 @@ const neonClient = createApiClient({
 });
 
 const neonBranchesRes = await neonClient.listProjectBranches(options.neonProjectId!)
-const neonBranches = neonBranchesRes.data.branches.map((neonBranch) => neonBranch.name)
+const neonBranches = neonBranchesRes.data.branches.map((neonBranch) => ({
+  id: neonBranch.id,
+  name: neonBranch.name
+}))
 
 neonBranches.forEach(async (neonBranch) => {
-  if(!ghBranches.includes(neonBranch)) {
-    const removalRes = await neonClient.deleteProjectBranch(options.neonProjectId!, neonBranch)
-    if (removalRes.status === 200) {
-      console.log(`${neonBranch} removed!`)
-    } else {
-      console.log(`Error removing ${neonBranch}!`)
-    }
+  if(!ghBranches.includes(neonBranch.name)) {
+    await neonClient.deleteProjectBranch(options.neonProjectId!, neonBranch.id).then((response) => {
+      if (response.status === 200) {
+        console.log(`${neonBranch.name} removed!`, response.data)
+      } else {
+        console.log(`Error removing ${neonBranch.name}!`)
+      }
+    })
   }
 })
