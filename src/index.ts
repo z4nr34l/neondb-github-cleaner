@@ -30,7 +30,7 @@ const branchesRes = await octokit.rest.repos.listBranches({
   owner: options.owner!,
   repo: options.repository!
 })
-const ghBranches = branchesRes.data.map((branch) => branch.name)
+const ghBranches = branchesRes.data.map((branch) => branch.name).concat(["main", "master", "dev", "release", "test"])
 
 const neonClient = createApiClient({
   apiKey: options.neonToken!,
@@ -48,8 +48,10 @@ neonBranches.forEach(async (neonBranch) => {
       if (response.status === 200) {
         console.log(`${neonBranch.name} removed!`, response.data)
       } else {
-        console.log(`Error removing ${neonBranch.name}!`)
+       throw new Error(response.statusText)
       }
+    }).catch((error) => {
+      console.error(`Error deleting ${neonBranch.name}`,error.response.data)
     })
   }
 })
