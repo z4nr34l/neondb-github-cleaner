@@ -30,7 +30,7 @@ const branchesRes = await octokit.rest.repos.listBranches({
   owner: options.owner!,
   repo: options.repository!
 })
-const ghBranches = branchesRes.data.map((branch) => branch.name).concat(["main", "master", "dev", "release", "test", "vercel-dev"])
+const ghBranches = branchesRes.data.map((branch) => `preview/${branch.name}`).concat(["main", "master", "dev", "release", "test", "vercel-dev"])
 
 const neonClient = createApiClient({
   apiKey: options.neonToken!,
